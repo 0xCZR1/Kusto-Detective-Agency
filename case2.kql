@@ -1,0 +1,8 @@
+Votes 
+| extend minute_bin = bin(Timestamp, 1m)
+| summarize Count_by_min = count() by minute_bin, vote, via_ip
+| extend real_vote = iif(Count_by_min >= 10, 0, Count_by_min)
+| summarize real_count = count(real_vote) by vote
+| as hint.materialized=true T
+| extend sum_of_real_count = toscalar(T | summarize sum(real_count))
+| extend percentage_of_real_count = round((todouble(real_count)/sum_of_real_count) * 100, 1)
