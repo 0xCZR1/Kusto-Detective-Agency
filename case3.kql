@@ -1,0 +1,10 @@
+let BankArea = Traffic
+| where Ave between (156 .. 158) and Street between (147 .. 149)
+| where Timestamp between (datetime(2022-10-16T08:31:00Z) .. datetime(2022-10-16T08:42:00Z))
+| summarize count() by VIN;
+Traffic
+| where Timestamp > datetime(2022-10-16 08:33:00)
+| summarize arg_max(Timestamp, *) by VIN
+| join kind = inner BankArea on VIN
+| summarize PossbileThieves = count() by Ave, Street
+| where PossbileThieves == 3
